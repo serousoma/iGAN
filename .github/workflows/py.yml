@@ -1,0 +1,26 @@
+name: Py
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        sudo apt-get install python-opencv python-qt4 -y
+        sudo pip install --upgrade dominate
+        sudo pip install --upgrade qdarkstyle
+        sudo pip install --upgrade --no-deps git+git://github.com/Theano/Theano.git
+        python -m pip install --upgrade pip
+        bash ./models/scripts/download_dcgan_model.sh outdoor_64
+    - name: Try to run it
+      run: |
+        THEANO_FLAGS='device=gpu0, floatX=float32, nvcc.fastmath=True' python iGAN_main.py --model_name outdoor_64
